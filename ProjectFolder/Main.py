@@ -52,25 +52,7 @@ class cell:
 
 
 
-#numbers to divide by based on the size of the board
-#8
-#14
-scalingNumberRow = 14
-#10
-#18
-scalingNumberCol = 18
 
-
-extraPixelsForInitialBoard = 10
-extraPixelsForCellScan = 20
-
-currBoard = []
-#makes a 2d array filled with zeroes to store cell objects in
-for x in range(scalingNumberRow):
-    column_elements = []
-    for y in range(scalingNumberCol):
-        column_elements.append('0')
-    currBoard.append(column_elements)
 
 
 
@@ -88,9 +70,13 @@ def checkQuitPause():
         os.system( "say The program is done" )
         sys.exit("Quit")
 
-def checkWin():
+def checkWinOrLose():
     if pyautogui.locateOnScreen('PictureHolder/WinImage.png'):
-        os.system( "say The program is done" )
+        os.system( "say Game Won. The program is done" )
+        sys.exit("Quit")
+
+    if pyautogui.locateOnScreen('PictureHolder/LoseImage.png'):
+        os.system( "say Game Lost. The program is done" )
         sys.exit("Quit")
 
 
@@ -105,13 +91,31 @@ then runs looper to check rules in each location on the board
 asks user if they would like to run ahain or quit
 calls runAgain on this inpout to see the input and will run or stop accordingly
 """
-def runScanner(boxCoords):    
+def runScanner(boxCoords, rowNum, colNum):    
+
+
+    currBoard = []
+    #makes a 2d array filled with zeroes to store cell objects in
+    for x in range(rowNum):
+        column_elements = []
+        for y in range(colNum):
+            column_elements.append('0')
+        currBoard.append(column_elements)
+
+    counter = 0
     while True:
         checkQuitPause()
-        scanBoard(boxCoords)
+        scanBoard(currBoard, boxCoords, rowNum, colNum)
+
         #runRules will check each rule and act accordingly on the board
-        rules.runRules(currBoard)
-        checkWin()
+        #if no actions taken after 3 loops, user is asked to click a green piece
+        counter += rules.runRules(currBoard)
+        if counter >= 3:
+            print("Please Click a green piece on the board")
+            os.system( "say Please Click a green piece on the board" )
+            counter = 0
+
+        checkWinOrLose()
         os.system( "say Current Board is scanned" )
 
 
@@ -129,17 +133,13 @@ def findBoard():
 
     boardLocEasy = (pyautogui.locateOnScreen('PictureHolder/EasyMap.png', confidence = .9))
     if boardLocEasy:
-        main.scalingNumberRow = 8
-        main.scalingNumberCol = 10
         os.system( "say Easy Board Loacated" )
-        return boardLocEasy
+        return boardLocEasy, 8, 10
 
     boardLocMedium = (pyautogui.locateOnScreen('PictureHolder/MedMap.png', confidence = .9))
     if boardLocMedium:
         os.system( "say Medium Board Loacated" )
-        scalingNumberRow = 14
-        scalingNumberCol = 18
-        return boardLocMedium
+        return boardLocMedium, 14, 18
     
     print("Board not found")
     os.system( "say Board could not be found" )
@@ -165,21 +165,25 @@ prints board
 then returns
 
 """
-def scanBoard(boxCoords):
+def scanBoard(currBoard, boxCoords, rowParam, colParam):
     start = time.time()
+    extraPixelsForInitialBoard = 10
+    extraPixelsForCellScan = 20
 
     print("Board Scan Started")
+    print(rowParam)
+    print(colParam)
 
 
-    for row in range(scalingNumberRow):
-        for column in range(scalingNumberCol):
+    for row in range(rowParam):
+        for column in range(colParam):
             #skips the piece if it is already known that it will not change
             if(currBoard[row][column] != '0' and currBoard[row][column].val != '-'):
                 continue
             checkQuitPause()
             
             #takes a picture with extra wide of the coordinates input so an image of a number can be found inside the  picture
-            im1 = pyautogui.screenshot(region=((boxCoords.left) - extraPixelsForInitialBoard + (column * boxCoords.width/scalingNumberCol), (boxCoords.top) - extraPixelsForInitialBoard + (row * boxCoords.height/scalingNumberRow), (boxCoords.width/scalingNumberCol) + extraPixelsForCellScan, (boxCoords.height/scalingNumberRow) + extraPixelsForCellScan))
+            im1 = pyautogui.screenshot(region=((boxCoords.left) - extraPixelsForInitialBoard + (column * boxCoords.width/colParam), (boxCoords.top) - extraPixelsForInitialBoard + (row * boxCoords.height/rowParam), (boxCoords.width/colParam) + extraPixelsForCellScan, (boxCoords.height/rowParam) + extraPixelsForCellScan))
             im1 = cv2.cvtColor(np.array(im1), cv2.COLOR_RGB2BGR)
             cv2.imwrite("CheckThis.png", im1)
 
@@ -212,7 +216,7 @@ def scanBoard(boxCoords):
             
             if(currBoard[row][column] == '0'):
                 #makes a cell object for each space in the output array
-                currBoard[row][column] = cell(whatIsVal, ((boxCoords.left) - extraPixelsForInitialBoard + (column * boxCoords.width/scalingNumberCol)), (boxCoords.top) - extraPixelsForInitialBoard + (row * boxCoords.height/scalingNumberRow))
+                currBoard[row][column] = cell(whatIsVal, ((boxCoords.left) - extraPixelsForInitialBoard + (column * boxCoords.width/colParam)), (boxCoords.top) - extraPixelsForInitialBoard + (row * boxCoords.height/rowParam))
             else:
                 currBoard[row][column].val = whatIsVal
 
@@ -242,23 +246,8 @@ then computer will say the program is done"""
 def main():
     print("Please have a blank version of google minesweeper on your screen so the board can be located")
 
-    """
-    testing portion
-
-    class Box:
-        def __init__(self, left, top, width, height):
-            self.left = left
-            self.top = top
-            self.width = width
-            self.height = height
-
-    #hard coded coordinates of the box for testing
-    my_box = Box(left=990, top=707, width=897, height=721)
-    runScanner(my_box)
-    """
-
-    location = findBoard()
-    runScanner(location)
+    location, rowNum, colNum = findBoard()
+    runScanner(location, rowNum, colNum)
 
 
 

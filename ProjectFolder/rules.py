@@ -3,17 +3,22 @@ This is a file that holds all the functions to check for patterns in the board t
 """
 
 import actions
-
+import os
 #must have the board passed in, will act as a sort of main function to check the board for patterns
 def runRules(board):
     maxRow = len(board)
     maxCol = len(board[0])
+    actionTaken = False
     for row in range(len(board)):
         for column in range(len(board[row])):
             if(board[row][column].testAgain == False):
                continue
-            checkAroundToMark(board, row, column, maxRow, maxCol)
-            checkAroundToClear(board, row, column, maxRow, maxCol)
+            if(checkAroundToMark(board, row, column, maxRow, maxCol) or checkAroundToClear(board, row, column, maxRow, maxCol)):
+                actionTaken = True
+    if not actionTaken:
+        return 1
+    else:
+        return 0
 
 
 #pass the board in, checks if there are as many flags as bombs around a spot
@@ -28,6 +33,7 @@ def checkAroundToClear(board, row, col, maxRow, maxCol):
             actions.clickAllAround(board, row, col, maxRow, maxCol)
             print("Clear all around " + str(col ) +", " + str(row))
             board[row][col].testAgain = False
+            return True
 
 
 #pass the board in, 
@@ -44,6 +50,7 @@ def checkAroundToMark(board, row, col, maxRow, maxCol):
         if((greenCount + flagCount == int(value)) and int(value) - flagCount != 0):
             print("Add a flag to every spot around " + str(col ) +", " + str(row ))
             actions.rightClickAllAround(board, row, col, maxRow, maxCol)
+            return True
 
 
 
