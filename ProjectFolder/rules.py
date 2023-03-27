@@ -3,7 +3,6 @@ This is a file that holds all the functions to check for patterns in the board t
 """
 
 import actions
-import os
 #must have the board passed in, will act as a sort of main function to check the board for patterns
 def runRules(board):
     maxRow = len(board)

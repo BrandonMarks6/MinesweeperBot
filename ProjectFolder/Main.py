@@ -22,14 +22,7 @@ pyautogui.locate takes an negligible amount of time
 pyautogui.screenshot is around .25 seconds
 """
 
-
 """
-Class will be used to hold data for one cell on the board along with coordinated in order to know where the cell is located on the board
-val = what is at the location on the screen 
-coord1 = top
-coord2 = left
-
-
 Val key:
 1 : 1
 2 : 2
@@ -41,24 +34,12 @@ X : Flag
 - : green(unclicked square)
 """
 
-
-
 class cell:
     def __init__(self, val, coord1, coord2):
         self.val = val
         self.coord1 = coord1
         self.coord2 = coord2
         self.testAgain = True 
-
-
-
-
-
-
-
-
-
-
 
 
 """
@@ -70,6 +51,9 @@ def checkQuitPause():
         os.system( "say The program is done" )
         sys.exit("Quit")
 
+"""
+will check for win or lose images on screen and terminate program if seen
+"""
 def checkWinOrLose():
     if pyautogui.locateOnScreen('PictureHolder/WinImage.png'):
         os.system( "say Game Won. The program is done" )
@@ -83,16 +67,9 @@ def checkWinOrLose():
 
 
 """
-takes in boxCoords
-returns nothing
-
-gets a copy of the board with scanBoard
-then runs looper to check rules in each location on the board
-asks user if they would like to run ahain or quit
-calls runAgain on this inpout to see the input and will run or stop accordingly
+runs the main functionality of the code
 """
 def runScanner(boxCoords, rowNum, colNum):    
-
 
     currBoard = []
     #makes a 2d array filled with zeroes to store cell objects in
@@ -103,9 +80,19 @@ def runScanner(boxCoords, rowNum, colNum):
         currBoard.append(column_elements)
 
     counter = 0
+    
+    #will run intil program is terminated
     while True:
         checkQuitPause()
+        
+        #populates the current board
         scanBoard(currBoard, boxCoords, rowNum, colNum)
+
+        #prints current board
+        for row in range(len(currBoard)):
+            for column in range(len(currBoard[row])):
+                print(currBoard[row][column].val, end = " ") 
+            print()
 
         #runRules will check each rule and act accordingly on the board
         #if no actions taken after 3 loops, user is asked to click a green piece
@@ -121,23 +108,22 @@ def runScanner(boxCoords, rowNum, colNum):
 
 
 """
-takes in nothing
-returns a set of boxcoords
-
 locates the board with pyautogui.locateOnScreen()
-returns that value
+returns the location of the board along with the grid length and height
 """
 def findBoard():
-    #waits two seconds after called to search for the game board
-    time.sleep(2)
+    #waits two seconds after called to search for the game board so user has time to switch screens if neccessary
+    time.sleep(4)
 
     boardLocEasy = (pyautogui.locateOnScreen('PictureHolder/EasyMap.png', confidence = .9))
     if boardLocEasy:
+        print("Easy Board Loacated")
         os.system( "say Easy Board Loacated" )
         return boardLocEasy, 8, 10
 
     boardLocMedium = (pyautogui.locateOnScreen('PictureHolder/MedMap.png', confidence = .9))
     if boardLocMedium:
+        print("Medium Board Loacated")
         os.system( "say Medium Board Loacated" )
         return boardLocMedium, 14, 18
     
@@ -147,85 +133,65 @@ def findBoard():
 
 
 
-
 """
-takes in boxCoords
-returns a 2d  array representing the board
-
-makes an empty 2d array according to size of board
-scans each box in the array and fills in the according location on the array with the info
-stores info in each location with a cell object
-
-def __init__(self, val, coord1, coord2):
-        self.val = val
-        self.coord1 = coord1
-        self.coord2 = coord2
-
-prints board
-then returns
-
+Scans and populates the board
 """
 def scanBoard(currBoard, boxCoords, rowParam, colParam):
     start = time.time()
-    extraPixelsForInitialBoard = 10
-    extraPixelsForCellScan = 20
-
     print("Board Scan Started")
-    print(rowParam)
-    print(colParam)
+    #fills board with cells containing brown spaces
+    for row in range(rowParam):
+        for column in range(colParam):
+            currBoard[row][column] = cell('.', ((boxCoords.left) + (column * boxCoords.width/colParam)), (boxCoords.top) + (row * boxCoords.height/rowParam))
 
+
+    #determines which list based on size of board
+    if rowParam == 8:
+        pictureList = {'numbers/One.png' : '1', 'numbers/Two.png': '2', 'numbers/Three.png': '3', 'numbers/Four.png': '4', 'numbers/Five.png': '5', 'numbers/Six.png': '6', 'numbers/Flag.png': 'X'}
+    if rowParam == 14:
+        pictureList = {'numbers/MedOne.png' : '1', 'numbers/MedTwo.png': '2', 'numbers/MedThree.png': '3', 'numbers/MedFour.png': '4', 'numbers/MedFive.png': '5', 'numbers/MedSix.png': '6',  'numbers/MedFlag.png': 'X'}
+
+    #will check for each picture on the screen
+    for currentPicture in pictureList.keys():
+        #makes a tuple of all the locations of the ucrrent picture
+        #loops through each location in the tuple
+        for currentCoords in pyautogui.locateAllOnScreen(currentPicture, grayscale=True, confidence=0.85):
+            rowToInsert = 0
+            while rowToInsert + 1 < rowParam:
+                if currentCoords.top > currBoard[rowToInsert][0].coord2 and currentCoords.top < currBoard[rowToInsert + 1][0].coord2:
+                    break
+                rowToInsert += 1
+
+            colToInsert = 0
+            while colToInsert + 1 < colParam:
+                if currentCoords.left > currBoard[0][colToInsert].coord1 and currentCoords.left < currBoard[0][colToInsert + 1].coord1:
+                    break
+                colToInsert += 1
+
+            #inserts in ocrrect spot based on the coordinates of the found item
+            currBoard[rowToInsert][colToInsert].val = pictureList.get(currentPicture)
+
+
+
+    #below will add all correct green spaces to the board
+
+    #takes a picture with extra wide of the coordinates input so an image of a number can be found inside the  picture
+    im1 = pyautogui.screenshot(region=(boxCoords))
+    im1 = cv2.cvtColor(np.array(im1), cv2.COLOR_RGB2BGR)
+    cv2.imwrite("CheckThis.png", im1)
+
+    check = Image.open('CheckThis.png')
+    pix = check.load()
+
+    picHeight = check.height
+    picLength = check.size[0]
 
     for row in range(rowParam):
         for column in range(colParam):
-            #skips the piece if it is already known that it will not change
-            if(currBoard[row][column] != '0' and currBoard[row][column].val != '-'):
-                continue
-            checkQuitPause()
-            
-            #takes a picture with extra wide of the coordinates input so an image of a number can be found inside the  picture
-            im1 = pyautogui.screenshot(region=((boxCoords.left) - extraPixelsForInitialBoard + (column * boxCoords.width/colParam), (boxCoords.top) - extraPixelsForInitialBoard + (row * boxCoords.height/rowParam), (boxCoords.width/colParam) + extraPixelsForCellScan, (boxCoords.height/rowParam) + extraPixelsForCellScan))
-            im1 = cv2.cvtColor(np.array(im1), cv2.COLOR_RGB2BGR)
-            cv2.imwrite("CheckThis.png", im1)
-
-            check = Image.open('CheckThis.png')
-            pix = check.load()
-
-
-            whatIsVal = '.'
-            #checks each box for a number or flag according to the pictures in the "numbers" folder
-            if pyautogui.locate('numbers/One.png', 'CheckThis.png', confidence = .8, grayscale= True) or pyautogui.locate('numbers/MedOne.png', 'CheckThis.png', confidence = .8, grayscale= True):
-                whatIsVal = '1'
-            elif pyautogui.locate('numbers/Two.png', 'CheckThis.png', confidence = .8, grayscale= True) or pyautogui.locate('numbers/MedTwo.png', 'CheckThis.png', confidence = .8, grayscale= True):
-                whatIsVal = '2'
-            elif pyautogui.locate('numbers/Three.png', 'CheckThis.png', confidence = .8, grayscale= True) or pyautogui.locate('numbers/MedThree.png', 'CheckThis.png', confidence = .8, grayscale= True):
-                whatIsVal = '3'
-            elif pyautogui.locate('numbers/Four.png', 'CheckThis.png', confidence = .8, grayscale= True) or pyautogui.locate('numbers/MedFour.png', 'CheckThis.png', confidence = .8, grayscale= True):
-                whatIsVal = '4'
-            elif pyautogui.locate('numbers/Five.png', 'CheckThis.png', confidence = .8, grayscale= True) or pyautogui.locate('numbers/MedFive.png', 'CheckThis.png', confidence = .8, grayscale= True):
-                whatIsVal = '5'
-            elif pyautogui.locate('numbers/Six.png', 'CheckThis.png', confidence = .8, grayscale= True) or pyautogui.locate('numbers/MedSix.png', 'CheckThis.png', confidence = .8, grayscale= True):
-                whatIsVal = '6'
-            elif pyautogui.locate('numbers/Flag.png', 'CheckThis.png', confidence = .8, grayscale= True):
-                whatIsVal = 'X'
-
-            if whatIsVal == '.':
-                #checks against the RGB values of the color of a light green or dark green square
-                if(pix[20,20] == (179, 214, 101)) or (pix[20,20] == (172, 208, 94)):
-                    whatIsVal = '-'
-
-            
-            if(currBoard[row][column] == '0'):
-                #makes a cell object for each space in the output array
-                currBoard[row][column] = cell(whatIsVal, ((boxCoords.left) - extraPixelsForInitialBoard + (column * boxCoords.width/colParam)), (boxCoords.top) - extraPixelsForInitialBoard + (row * boxCoords.height/rowParam))
-            else:
-                currBoard[row][column].val = whatIsVal
-
-
-    #prints the gameboard
-    for row in range(len(currBoard)):
-        for column in range(len(currBoard[row])):
-            print(currBoard[row][column].val, end = " ") #print each element
-        print()
+            #checks against the RGB values of the color of a light green or dark green square
+            if(pix[(column * (picLength /colParam)) + 10, (row * (picHeight /rowParam)) + 10] == (179, 214, 101)) or (pix[(column * (picLength /colParam) + 10), (row * (picHeight /rowParam) + 10)] == (172, 208, 94)):
+                if(currBoard[row][column].val != 'X'):
+                    currBoard[row][column].val = '-'
 
 
     end = time.time()
@@ -234,24 +200,15 @@ def scanBoard(currBoard, boxCoords, rowParam, colParam):
 
 
 
-
-
-"""
-Main function
-starts a "timer" when program is started
-find the board and stores it coordinates
-runs the scanner on the board to populate array
-ends the timer and oprints the timer 
-then computer will say the program is done"""
+###########################################################################################################
+#Main Function will find the board then enter the board into the scanner with the row and column numbers
 def main():
     print("Please have a blank version of google minesweeper on your screen so the board can be located")
 
     location, rowNum, colNum = findBoard()
     runScanner(location, rowNum, colNum)
 
-
-
-
 #calls the main function
 if __name__ == "__main__":
     main()
+###########################################################################################################
