@@ -10,7 +10,7 @@ Multiple files were used to seperate main functionality from rules to check and 
 ## Instructions:
 
 * All necessary instructions are audible
-* The program can be started with a blank version of easy google minesweeper open
+* The program can be started with a blank version of Easy or Medium google minesweeper open
 * Once board has been located, user may click the board once to start the game
 * All functionality should be taken by the computer aftwards
 * Program can be quit at anytime by holding the 'q' key until the audible message, "The program has been quit" is read
@@ -18,7 +18,7 @@ Multiple files were used to seperate main functionality from rules to check and 
 ## Important Notes:
 
 * Written and tested only on M1 Macbook Air
-* Currently only works on easy mode on Google Minesweeper
+* Currently only works on easy and medium mode on Google Minesweeper
 
 ## Possible Future Additions
 
