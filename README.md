@@ -6,6 +6,7 @@ This program uses a combination of photo recognition and graph traversal algorit
 Multiple files were used to seperate main functionality from rules to check and actions to take. The main file does the work of locating and scanning the board as well as calling the rules function, runRules(), to traverse the board. The rules file then checks each space according to the rules and calls the actions neccessary depending on what it sees at and around the current cell.
 
 [Link to Video Showing Bot Play the Game(Easy)](https://youtu.be/cROwUfQSFP8)
+
 [Link to Video Showing Bot Play the Game(Medium)](https://youtu.be/lE4W_x1TUSU)
 
 
