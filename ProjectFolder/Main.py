@@ -1,3 +1,7 @@
+#######################################
+# Name: Brandon Marks                 #
+# Purpose: to play google minesweeper #
+#######################################
 import rules
 
 import keyboard
@@ -8,18 +12,13 @@ from PIL import Image
 
 
 """
-Color RGB Values
-Blue(1) = (56, 116, 203)
-Green(2) = (80, 140, 70)
-Red(3) = (193, 63, 56)
-Purple(4) = (113, 38, 156)
-Yellow(5) = (240, 148, 54)
+Notes:
 
 Use the win32api to click because it is faster than pyaautogui
 -pause for .01 second to make sure it executes
 
-pyautogui.locate takes an negligible amount of time 
 pyautogui.screenshot is around .25 seconds
+Pyautogui locate all is much faster.(Returns a generator of locations)
 """
 
 """
@@ -35,11 +34,13 @@ X : Flag
 """
 
 class cell:
+    #will represent each cell on the board
     def __init__(self, val, coord1, coord2):
         self.val = val
         self.coord1 = coord1
         self.coord2 = coord2
         self.testAgain = True 
+        self.clicked = False
 
 
 """
@@ -127,6 +128,12 @@ def findBoard():
         os.system( "say Medium Board Loacated" )
         return boardLocMedium, 14, 18
     
+    boardLocHard = (pyautogui.locateOnScreen('PictureHolder/HardMap.png', confidence = .9))
+    if boardLocHard:
+        print("Hard Board Loacated")
+        os.system( "say Hard Board Loacated" )
+        return boardLocHard, 20, 24
+    
     print("Board not found")
     os.system( "say Board could not be found" )
     sys.exit("Quit")
@@ -150,6 +157,8 @@ def scanBoard(currBoard, boxCoords, rowParam, colParam):
         pictureList = {'numbers/One.png' : '1', 'numbers/Two.png': '2', 'numbers/Three.png': '3', 'numbers/Four.png': '4', 'numbers/Five.png': '5', 'numbers/Six.png': '6', 'numbers/Flag.png': 'X'}
     if rowParam == 14:
         pictureList = {'numbers/MedOne.png' : '1', 'numbers/MedTwo.png': '2', 'numbers/MedThree.png': '3', 'numbers/MedFour.png': '4', 'numbers/MedFive.png': '5', 'numbers/MedSix.png': '6',  'numbers/MedFlag.png': 'X'}
+    if rowParam == 20:
+        pictureList = {'numbers/HardOne.png' : '1', 'numbers/HardTwo.png': '2', 'numbers/HardThree.png': '3', 'numbers/HardFour.png': '4', 'numbers/HardFive.png': '5', 'numbers/MedSix.png': '6',  'numbers/HardFlag.png': 'X'}
 
     #will check for each picture on the screen
     for currentPicture in pictureList.keys():
