@@ -48,9 +48,14 @@ will quit the program when the q button is pressed
 this check is spread throughout the program so it should execute close to always
 """
 def checkQuitPause():
+    return
     if keyboard.is_pressed('q'): 
         os.system( "say The program is done" )
         sys.exit("Quit")
+
+
+#keyboard.add_hotkey("q", lambda: sys.exit("Quit"))
+
 
 """
 will check for win or lose images on screen and terminate program if seen
@@ -156,7 +161,7 @@ def scanBoard(currBoard, boxCoords, rowParam, colParam):
     if rowParam == 8:
         pictureList = {'numbers/One.png' : '1', 'numbers/Two.png': '2', 'numbers/Three.png': '3', 'numbers/Four.png': '4', 'numbers/Five.png': '5', 'numbers/Six.png': '6', 'numbers/Flag.png': 'X'}
     if rowParam == 14:
-        pictureList = {'numbers/MedOne.png' : '1', 'numbers/MedTwo.png': '2', 'numbers/MedThree.png': '3', 'numbers/MedFour.png': '4', 'numbers/MedFive.png': '5', 'numbers/MedSix.png': '6',  'numbers/MedFlag.png': 'X'}
+        pictureList = {'numbers/MedOne.png' : '1', 'numbers/MedTwo.png': '2', 'numbers/MedThree.png': '3', 'numbers/MedFour.png': '4', 'numbers/MedFive.png': '5', 'numbers/MedSix.png': '6', 'numbers/MedSeven.png': '7',  'numbers/MedFlag.png': 'X'}
     if rowParam == 20:
         pictureList = {'numbers/HardOne.png' : '1', 'numbers/HardTwo.png': '2', 'numbers/HardThree.png': '3', 'numbers/HardFour.png': '4', 'numbers/HardFive.png': '5', 'numbers/MedSix.png': '6',  'numbers/HardFlag.png': 'X'}
 
