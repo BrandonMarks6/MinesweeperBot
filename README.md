@@ -16,11 +16,10 @@ Multiple files were used to seperate main functionality from rules to check and 
 * The program can be started with a blank version any level difficulty google minesweeper open
 * Once board has been located, user may click the board once to start the game
 * All functionality should be taken by the computer aftwards unless guessing situation is encountered
-* Program can be quit at anytime by holding the 'q' key until the audible message, "The program has been quit" is read
 
 ## Important Notes:
 
-* Written and tested only on M1 Macbook Air in Safari
+* Written and tested on M1 Macbook Air in Safari
 * Currently works on all modes of Google Minesweeper
 * Struggles with Hard mode due to the common situation where there has to be a guess in order to complete
 
