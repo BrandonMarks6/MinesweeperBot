@@ -8,8 +8,9 @@ def runRules(board):
     maxRow = len(board)
     maxCol = len(board[0])
     actionTaken = False
-    for row in range(len(board)):
-        for column in range(len(board[row])):
+    for row in range(maxRow):
+        for column in range(maxCol):
+            #if set to false, will not visit space again for efficiency purposes
             if(board[row][column].testAgain == False):
                continue
             if(checkAroundToMark(board, row, column, maxRow, maxCol) or checkAroundToClear(board, row, column, maxRow, maxCol)):
@@ -22,31 +23,30 @@ def runRules(board):
 
 #pass the board in, checks if there are as many flags as bombs around a spot
 def checkAroundToClear(board, row, col, maxRow, maxCol):
-    holder = getGreenAndFlag(board, row, col, maxRow, maxCol)
     value = (board[row][col]).val
-    flagCount = holder[1]
-    greenCount = holder[0]
-
+    
     if(value != '.' and value != 'X' and value != '-'):
-        if(flagCount == int(value) and greenCount > 0):
+        holder = getGreenAndFlag(board, row, col, maxRow, maxCol)#gets number of green spaces and flag spaces
+        flagCount = holder[1]
+        greenCount = holder[0]
+
+        if(flagCount == int(value) and greenCount > 0):#if there is as many flags as there are bombs, click all around
             actions.clickAllAround(board, row, col, maxRow, maxCol)
             print("Clear all around " + str(col ) +", " + str(row))
-            board[row][col].testAgain = False
+            board[row][col].testAgain = False#to ensure this space wont be tested again
             return True
 
 
-#pass the board in, 
+#pass the board in, checks if there are as man green spaces as there are supposed to be bombs
 def checkAroundToMark(board, row, col, maxRow, maxCol):
-
-    holder = getGreenAndFlag(board, row, col, maxRow, maxCol)#0 index is number of greens around the cell 1 index is number of flags
     value = (board[row][col]).val#number stores in the current cell
-    flagCount = holder[1]
-    greenCount = holder[0]
-
-
+    
     if(value != '.' and value != 'X' and value != '-'):
-        #possibly be improved by - amount of flags but errorrs will need to be fixed(THIS WILL NEED TO BE IMPLEMENTED FOR THE PROGRAM TO WORK)
-        if((greenCount + flagCount == int(value)) and int(value) - flagCount != 0):
+        holder = getGreenAndFlag(board, row, col, maxRow, maxCol)#0 index is number of greens around the cell 1 index is number of flags
+        flagCount = holder[1]
+        greenCount = holder[0]
+        
+        if((greenCount + flagCount == int(value)) and int(value) - flagCount != 0):#checks if there are as man green spaces as there are supposed to be bombs, flag all around
             print("Add a flag to every spot around " + str(col ) +", " + str(row ))
             actions.rightClickAllAround(board, row, col, maxRow, maxCol)
             return True
@@ -56,58 +56,26 @@ def checkAroundToMark(board, row, col, maxRow, maxCol):
 
 #returns and array [greencounter, flagCounter] of the maxRow sqaures surrounding the cell
 def getGreenAndFlag(board, row, col, maxRow, maxCol):
-    
-    flagCounter = 0
-    #check down left
-    if(row + 1 < maxRow and col - 1 >= 0 and board[row + 1][col - 1].val == 'X'):
-        flagCounter += 1
-    #check down    
-    if(row + 1 < maxRow and board[row + 1][col].val == 'X'):
-        flagCounter += 1
-    #check down right
-    if(row + 1 < maxRow and col + 1 < maxCol and board[row + 1][col + 1].val == 'X'):
-        flagCounter += 1
-    #check left
-    if(col - 1 >= 0 and board[row][col - 1].val == 'X'):
-        flagCounter += 1
-    #check right
-    if(col + 1 < maxCol and board[row][col + 1].val == 'X'):
-        flagCounter += 1
-    #check up left
-    if(row - 1 >= 0 and col - 1 >= 0 and board[row - 1][col - 1].val == 'X'):
-        flagCounter += 1
-    #check up
-    if(row - 1 >= 0 and board[row - 1][col].val == 'X'):
-        flagCounter += 1
-    #check up right
-    if(row - 1 >= 0 and col + 1 < maxCol and board[row - 1][col + 1].val == 'X'):
-        flagCounter += 1
-
-    greenCounter = 0
-    #check down left
-    if(row + 1 < maxRow and col - 1 >= 0 and board[row + 1][col - 1].val == '-'):
-        greenCounter += 1
-    #check down    
-    if(row + 1 < maxRow and board[row + 1][col].val == '-'):
-        greenCounter += 1
-    #check down right
-    if(row + 1 < maxRow and col + 1 < maxCol and board[row + 1][col + 1].val == '-'):
-        greenCounter += 1
-    #check left
-    if(col - 1 >= 0 and board[row][col - 1].val == '-'):
-        greenCounter += 1
-    #check right
-    if(col + 1 < maxCol and board[row][col + 1].val == '-'):
-        greenCounter += 1
-    #check up left
-    if(row - 1 >= 0 and col - 1 >= 0 and board[row - 1][col - 1].val == '-'):
-        greenCounter += 1
-    #check up
-    if(row - 1 >= 0 and board[row - 1][col].val == '-'):
-        greenCounter += 1
-    #check up right
-    if(row - 1 >= 0 and col + 1 < maxCol and board[row - 1][col + 1].val == '-'):
-        greenCounter += 1
-
+    flagCounter = checkForChar('X', board, row, col, maxRow, maxCol)
+    greenCounter = checkForChar('-', board, row, col, maxRow, maxCol)
 
     return [greenCounter, flagCounter]
+
+
+#returns the number of occurences of passed in char in the 8 spaces surrounding the current location
+def checkForChar(currChar, board, row, col, maxRow, maxCol):
+    counter = 0
+
+    #will loop through the 3x3 grid of cells around passed in cell
+    for currRow in range(row - 1, row + 2):
+        for currCol in range(col - 1, col + 2):
+
+            if(currRow  < maxRow and currRow >= 0 and currCol < maxCol and currCol >= 0):#tests to make sure number is in correct range
+                currentCell = board[currRow][currCol]
+
+                if(currentCell.val == currChar):
+                    counter += 1
+
+
+    return counter
+        

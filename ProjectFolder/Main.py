@@ -4,22 +4,9 @@
 #######################################
 import rules
 
-import keyboard
 import pyautogui, cv2, time, os, sys
 import numpy as np
 from PIL import Image
-
-
-
-"""
-Notes:
-
-Use the win32api to click because it is faster than pyaautogui
--pause for .01 second to make sure it executes
-
-pyautogui.screenshot is around .25 seconds
-Pyautogui locate all is much faster.(Returns a generator of locations)
-"""
 
 """
 Val key:
@@ -33,28 +20,23 @@ X : Flag
 - : green(unclicked square)
 """
 
+#constants to be used within the program
+EASY_LENGTH = 10
+EASY_HEIGHT = 8
+MEDIUM_LENGTH = 18
+MEDIUM_HEIGHT = 14
+HARD_LENGTH = 24
+HARD_HEIGHT = 20
+
+
+#class will represent each cell on the board
 class cell:
-    #will represent each cell on the board
     def __init__(self, val, coord1, coord2):
         self.val = val
         self.coord1 = coord1
         self.coord2 = coord2
         self.testAgain = True 
         self.clicked = False
-
-
-"""
-will quit the program when the q button is pressed
-this check is spread throughout the program so it should execute close to always
-"""
-def checkQuitPause():
-    return
-    if keyboard.is_pressed('q'): 
-        os.system( "say The program is done" )
-        sys.exit("Quit")
-
-
-#keyboard.add_hotkey("q", lambda: sys.exit("Quit"))
 
 
 """
@@ -68,7 +50,6 @@ def checkWinOrLose():
     if pyautogui.locateOnScreen('PictureHolder/LoseImage.png'):
         os.system( "say Game Lost. The program is done" )
         sys.exit("Quit")
-
 
 
 
@@ -87,11 +68,9 @@ def runScanner(boxCoords, rowNum, colNum):
 
     counter = 0
     
-    #will run intil program is terminated
-    while True:
-        checkQuitPause()
-        
-        #populates the current board
+    #will run until program is terminated
+    while True:        
+        #populates the current board by scanning screen for images
         scanBoard(currBoard, boxCoords, rowNum, colNum)
 
         #prints current board
@@ -121,23 +100,23 @@ def findBoard():
     #waits two seconds after called to search for the game board so user has time to switch screens if neccessary
     time.sleep(4)
 
-    boardLocEasy = (pyautogui.locateOnScreen('PictureHolder/EasyMap.png', confidence = .9))
+    boardLocEasy = (pyautogui.locateOnScreen('PictureHolder/EasyMap.png', confidence = .8))
     if boardLocEasy:
         print("Easy Board Loacated")
         os.system( "say Easy Board Loacated" )
-        return boardLocEasy, 8, 10
+        return boardLocEasy, EASY_HEIGHT, EASY_LENGTH
 
     boardLocMedium = (pyautogui.locateOnScreen('PictureHolder/MedMap.png', confidence = .9))
     if boardLocMedium:
         print("Medium Board Loacated")
         os.system( "say Medium Board Loacated" )
-        return boardLocMedium, 14, 18
+        return boardLocMedium, MEDIUM_HEIGHT, MEDIUM_LENGTH
     
     boardLocHard = (pyautogui.locateOnScreen('PictureHolder/HardMap.png', confidence = .9))
     if boardLocHard:
         print("Hard Board Loacated")
         os.system( "say Hard Board Loacated" )
-        return boardLocHard, 20, 24
+        return boardLocHard, HARD_HEIGHT, HARD_LENGTH
     
     print("Board not found")
     os.system( "say Board could not be found" )
@@ -158,40 +137,51 @@ def scanBoard(currBoard, boxCoords, rowParam, colParam):
 
 
     #determines which list based on size of board
-    if rowParam == 8:
+    if rowParam == EASY_HEIGHT:
         pictureList = {'numbers/One.png' : '1', 'numbers/Two.png': '2', 'numbers/Three.png': '3', 'numbers/Four.png': '4', 'numbers/Five.png': '5', 'numbers/Six.png': '6', 'numbers/Flag.png': 'X'}
-    if rowParam == 14:
+    if rowParam == MEDIUM_HEIGHT:
         pictureList = {'numbers/MedOne.png' : '1', 'numbers/MedTwo.png': '2', 'numbers/MedThree.png': '3', 'numbers/MedFour.png': '4', 'numbers/MedFive.png': '5', 'numbers/MedSix.png': '6', 'numbers/MedSeven.png': '7',  'numbers/MedFlag.png': 'X'}
-    if rowParam == 20:
+    if rowParam == HARD_HEIGHT:
         pictureList = {'numbers/HardOne.png' : '1', 'numbers/HardTwo.png': '2', 'numbers/HardThree.png': '3', 'numbers/HardFour.png': '4', 'numbers/HardFive.png': '5', 'numbers/MedSix.png': '6',  'numbers/HardFlag.png': 'X'}
 
     #will check for each picture on the screen
     for currentPicture in pictureList.keys():
-        #makes a tuple of all the locations of the ucrrent picture
+
+        #makes a tuple of all the locations of the current picture
         #loops through each location in the tuple
-        for currentCoords in pyautogui.locateAllOnScreen(currentPicture, grayscale=True, confidence=0.85):
+        allFoundLocations = pyautogui.locateAllOnScreen(currentPicture, grayscale=True, confidence=0.85)
+        for currentCoords in allFoundLocations:
             rowToInsert = 0
+
+            #while loop will loop through current rows in board until the correct location is found of the current location of the picture
             while rowToInsert + 1 < rowParam:
-                if currentCoords.top > currBoard[rowToInsert][0].coord2 and currentCoords.top < currBoard[rowToInsert + 1][0].coord2:
+                bottomRangeRows = currBoard[rowToInsert][0].coord2
+                topRangeRows = currBoard[rowToInsert + 1][0].coord2
+                if currentCoords.top > bottomRangeRows and currentCoords.top < topRangeRows:
                     break
                 rowToInsert += 1
 
+
+            #while loop will loop through current columns in board until the correct location is found of the current location of the picture
             colToInsert = 0
             while colToInsert + 1 < colParam:
-                if currentCoords.left > currBoard[0][colToInsert].coord1 and currentCoords.left < currBoard[0][colToInsert + 1].coord1:
+                bottomRangeCols = currBoard[0][colToInsert].coord1
+                topRangeCols = currBoard[0][colToInsert + 1].coord1
+                if currentCoords.left > bottomRangeCols and currentCoords.left < topRangeCols:
                     break
                 colToInsert += 1
 
-            #inserts in ocrrect spot based on the coordinates of the found item
+            #inserts in correct spot based on the coordinates of the found item
             currBoard[rowToInsert][colToInsert].val = pictureList.get(currentPicture)
 
 
 
     #below will add all correct green spaces to the board
 
-    #takes a picture with extra wide of the coordinates input so an image of a number can be found inside the  picture
+    #takes a picture with extra wide of the board to make sure to capture entire thing
     im1 = pyautogui.screenshot(region=(boxCoords))
     im1 = cv2.cvtColor(np.array(im1), cv2.COLOR_RGB2BGR)
+    #writes the image to "CheckThis.png" 
     cv2.imwrite("CheckThis.png", im1)
 
     check = Image.open('CheckThis.png')
@@ -200,11 +190,15 @@ def scanBoard(currBoard, boxCoords, rowParam, colParam):
     picHeight = check.height
     picLength = check.size[0]
 
+    paddingNum = 10
+
     for row in range(rowParam):
         for column in range(colParam):
             #checks against the RGB values of the color of a light green or dark green square
-            if(pix[(column * (picLength /colParam)) + 10, (row * (picHeight /rowParam)) + 10] == (179, 214, 101)) or (pix[(column * (picLength /colParam) + 10), (row * (picHeight /rowParam) + 10)] == (172, 208, 94)):
-                if(currBoard[row][column].val != 'X'):
+            lightGreenValues = (179, 214, 101)
+            darkGreenValues = (172, 208, 94)
+            if(pix[(column * (picLength /colParam)) + paddingNum, (row * (picHeight /rowParam)) + paddingNum] == lightGreenValues) or (pix[(column * (picLength /colParam) + paddingNum), (row * (picHeight /rowParam) + paddingNum)] == darkGreenValues):
+                if(currBoard[row][column].val != 'X'):#only assigns a green tile if there is not a flag currently on the tile
                     currBoard[row][column].val = '-'
 
 

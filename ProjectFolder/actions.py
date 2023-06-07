@@ -3,80 +3,34 @@ this file will hold all of the action funtions to work on the board
 """
 import pyautogui
 
+#constants
+PADDING_FACTOR = 20
+PIXEL_DIVISION_FACTOR = 2 #Is used to convert coordinates from pyautoguin to correct location
 
 def clickAllAround(board, row, col, maxRow, maxCol):
-    #check down left
-    if(row + 1 < maxRow and col - 1 >= 0 and board[row + 1][col - 1].val == '-'):
-        if not board[row + 1][col - 1].clicked:
-            pyautogui.click(board[row + 1][col - 1].coord1/ 2 + 20, board[row + 1][col - 1].coord2 / 2 + 20)
-            board[row + 1][col - 1].clicked = True
-    #check down    
-    if(row + 1 < maxRow and board[row + 1][col].val == '-'):
-        if not board[row + 1][col].clicked:
-            pyautogui.click(board[row + 1][col].coord1/ 2 + 20, board[row + 1][col].coord2 / 2 + 20)
-            board[row + 1][col].clicked = True
-    #check down right
-    if(row + 1 < maxRow and col + 1 < maxCol and board[row + 1][col + 1].val == '-'):
-        if not board[row + 1][col + 1].clicked:
-            pyautogui.click(board[row + 1][col + 1].coord1/ 2 + 20, board[row + 1][col + 1].coord2 / 2 + 20)
-            board[row + 1][col + 1].clicked = True
-    #check left
-    if(col - 1 >= 0) and board[row][col - 1].val == '-':
-        if not board[row][col - 1].clicked:
-            pyautogui.click(board[row][col - 1].coord1/ 2 + 20, board[row][col - 1].coord2 / 2 + 20)
-            board[row][col - 1].clicked = True
-    #check right
-    if(col + 1 < maxCol and board[row][col + 1].val == '-'):
-        if not board[row][col + 1].clicked:
-            pyautogui.click(board[row][col + 1].coord1/ 2 + 20, board[row][col + 1].coord2 / 2 + 20)
-            board[row][col + 1].clicked = True
-    #check up left
-    if(row - 1 >= 0 and col - 1 >= 0 and board[row - 1][col - 1].val == '-'):
-        if not board[row - 1][col - 1].clicked:
-            pyautogui.click(board[row - 1][col - 1].coord1/ 2 + 20, board[row - 1][col - 1].coord2 / 2 + 20)
-            board[row - 1][col - 1].clicked = True
-    #check up
-    if(row - 1 >= 0 and board[row - 1][col].val == '-'):
-        if not board[row - 1][col].clicked:
-            pyautogui.click(board[row - 1][col].coord1/ 2 + 20, board[row - 1][col].coord2 / 2 + 20)
-            board[row - 1][col].clicked = True
-    #check up right
-    if(row - 1 >= 0 and col + 1 < maxCol and board[row - 1][col + 1].val == '-'):
-        if not board[row - 1][col + 1].clicked:
-            pyautogui.click(board[row - 1][col + 1].coord1/ 2 + 20, board[row - 1][col + 1].coord2 / 2 + 20)
-            board[row - 1][col + 1].clicked = True
+    #will loop through the 3x3 grid of cells around passed in cell
+    for currRow in range(row - 1, row + 2):
+
+        for currCol in range(col - 1, col + 2):
+        
+            if(currRow  < maxRow and currRow >= 0 and currCol < maxCol and currCol >= 0):#tests to make sure number is in correct range
+                currrentSpace = board[currRow][currCol]
+
+                if(not currrentSpace.clicked and currrentSpace.val == '-'):#if cell has not already been clickd and it is a correct value, click it and mark as clicked
+                    pyautogui.click(currrentSpace.coord1/PIXEL_DIVISION_FACTOR + PADDING_FACTOR, currrentSpace.coord2/PIXEL_DIVISION_FACTOR + PADDING_FACTOR)
+                    currrentSpace.clicked = True
+    
 
 def rightClickAllAround(board, row, col, maxRow, maxCol):
-    #check down left
-    if(row + 1 < maxRow and col - 1 >= 0 and board[row + 1][col - 1].val == '-'):
-        pyautogui.rightClick(board[row + 1][col - 1].coord1/ 2 + 20, board[row + 1][col - 1].coord2 / 2 + 20)
-        board[row + 1][col - 1].val = 'X'
-    #check down    
-    if(row + 1 < maxRow and board[row + 1][col].val == '-'):
-        pyautogui.rightClick(board[row + 1][col].coord1/ 2 + 20, board[row + 1][col].coord2 / 2 + 20)
-        board[row + 1][col].val = 'X'
-    #check down right
-    if(row + 1 < maxRow and col + 1 < maxCol and board[row + 1][col + 1].val == '-'):
-        pyautogui.rightClick(board[row + 1][col + 1].coord1/ 2 + 20, board[row + 1][col + 1].coord2 / 2 + 20)
-        board[row + 1][col + 1].val = 'X'
-    #check left
-    if(col - 1 >= 0 and board[row][col - 1].val == '-'):
-        pyautogui.rightClick(board[row][col - 1].coord1/ 2 + 20, board[row][col - 1].coord2 / 2 + 20)
-        board[row][col - 1].val = 'X'
-    #check right
-    if(col + 1 < maxCol and board[row][col + 1].val == '-'):
-        pyautogui.rightClick(board[row][col + 1].coord1/ 2 + 20, board[row][col + 1].coord2 / 2 + 20)
-        board[row][col + 1].val = 'X'
-    #check up left
-    if(row - 1 >= 0 and col - 1 >= 0 and board[row - 1][col - 1].val == '-'):
-        pyautogui.rightClick(board[row - 1][col - 1].coord1/ 2 + 20, board[row - 1][col - 1].coord2 / 2 + 20)
-        board[row - 1][col - 1].val = 'X'
-    #check up
-    if(row - 1 >= 0 and board[row - 1][col].val == '-'):
-        pyautogui.rightClick(board[row - 1][col].coord1/ 2 + 20, board[row - 1][col].coord2 / 2 + 20)
-        board[row - 1][col].val = 'X'
-    #check up right
-    if(row - 1 >= 0 and col + 1 < maxCol and board[row - 1][col + 1].val == '-'):
-        pyautogui.rightClick(board[row - 1][col + 1].coord1/ 2 + 20, board[row - 1][col + 1].coord2 / 2 + 20)
-        board[row - 1][col + 1].val = 'X'
+    #will loop through the 3x3 grid of cells around passed in cell
+    for currRow in range(row - 1, row + 2):
 
+        for currCol in range(col - 1, col + 2):
+        
+            if(currRow  < maxRow and currRow >= 0 and currCol < maxCol and currCol >= 0):#tests to make sure number is in correct range
+                currrentSpace = board[currRow][currCol]
+                
+                if(not currrentSpace.clicked and currrentSpace.val == '-'):#if cell has not already been clickd and it is a correct value, click it and mark as clicked
+                    pyautogui.rightClick(currrentSpace.coord1/PIXEL_DIVISION_FACTOR + PADDING_FACTOR, currrentSpace.coord2/PIXEL_DIVISION_FACTOR + PADDING_FACTOR)
+                    board[currRow][currCol].val = 'X'
+    
