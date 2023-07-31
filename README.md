@@ -1,8 +1,17 @@
 # MinesweeperBot
 
+## Description
 A program to autonomously play Google Minesweeper, built using Python3, pyautogui, and CV2. Using a combination of image recognition and graph traversal techniques, the program achieves times much faster than the average player.
 
-Average Times:
+Average Times V1:
+- Easy: ~700 seconds
+- Medium: ~2400 seconds
+
+Average Times V2 (Optimized Scanning):
+- Easy: ~45 seconds
+- Medium: ~200 seconds
+
+Average Times V3 (Optimized Action Algorithms):
 - Easy: 31 seconds
 - Medium: 132 seconds
 
