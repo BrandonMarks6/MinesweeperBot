@@ -1,36 +1,33 @@
-# Minesweeper Bot
-A program to play google minesweeper
+# MinesweeperBot
 
-This program uses a combination of photo recognition and graph traversal algorithms to play Google Minesweeper. The locations of the boxes are based on the location of the original board and calculated based on the size of the board. Once board is scanned, actions are printed to the terminal and are automatically clicked with pyautogui click and right click functionality. The program will loop until the user stops it.
+A program to autonomously play Google Minesweeper, built using Python3, pyautogui, and CV2. Using a combination of image recognition and graph traversal techniques, the program achieves times much faster than the average player.
 
-Multiple files were used to seperate main functionality from rules to check and actions to take. The main file does the work of locating and scanning the board as well as calling the rules function, runRules(), to traverse the board. The rules file then checks each space according to the rules and calls the actions neccessary depending on what it sees at and around the current cell.
+Average Times:
+- Easy: 31 seconds
+- Medium: 132 seconds
 
-[Link to Video Showing Bot Play the Game(Easy)](https://youtu.be/cROwUfQSFP8)
+## Gameplay Examples
 
-[Link to Video Showing Bot Play the Game(Medium)](https://youtu.be/lE4W_x1TUSU)
+[Easy](https://youtu.be/cROwUfQSFP8)
 
+[Medium](https://youtu.be/lE4W_x1TUSU)
 
-## Instructions:
+## Installation and Setup Instructions
 
-* All necessary instructions are audible
-* The program can be started with a blank version any level difficulty google minesweeper open
-* Once board has been located, user may click the board once to start the game
-* All functionality should be taken by the computer aftwards unless guessing situation is encountered
+#### Example:
 
-## Important Notes:
+Clone down this repository. You will need `Python3` installed globally on your machine.
 
-* Written and tested on M1 Macbook Air in Safari
-* Currently works on all modes of Google Minesweeper
-* Struggles with Hard mode due to the common situation where there has to be a guess in order to complete
+Run:
 
-## Possible Future Additions
+`python3 Main.py`
 
-* Efficiency improvements
-* Ability to play on multiple different sites of minesweeper
-* Functionality on multiple operating systems
+## Reflection
 
+This was a personal project built to explore my interest in image recognition and algorithms in the context of a game I loved playing at the time.
 
+I set out to build a project that autonomously played Minesweeper at a level above the average player.
 
+The main challenge I ran into was optimization. The creation of the project was fairly straightforward, but the optimization is where I really had to research to figure it out. This problem allowed me to explore deeper into optimization of algorithms and how the image recognition was really working to figure out what would be the fastest. This showed me firsthand how important efficiency and optimization can really be when something is running hundreds of times or more.
 
-
-
+The main reason I chose Python3 to do this project is because of the extensive library of packages, especially ones pertaining to image recognition. I chose Pyautogui and CV2 due to the way they complement each other, as well as the fact that both of them had some functions that were very critical to this project. The Pyautogui locateAllOnScreen function was integral to the optimization that allowed me to cut times by 10X.
