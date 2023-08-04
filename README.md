@@ -15,11 +15,15 @@ Average Times V3 (Optimized Action Algorithms):
 - Easy: 31 seconds
 - Medium: 132 seconds
 
+Average Times V4 (Optimized Scanning and Clicking):
+- Easy: 19 seconds
+- Medium: 61 seconds
+
 ## Gameplay Examples
 
-[Easy](https://youtu.be/cROwUfQSFP8)
+[Easy](https://youtu.be/NYJF3HAblmw)
 
-[Medium](https://youtu.be/lE4W_x1TUSU)
+[Medium](https://youtu.be/3CfEtC1Apzk)
 
 ## Installation and Setup Instructions
 
