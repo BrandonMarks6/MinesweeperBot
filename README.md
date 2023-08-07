@@ -21,9 +21,9 @@ Average Times V4 (Optimized Scanning and Clicking):
 
 ## Gameplay Examples
 
-[Easy](https://youtu.be/NYJF3HAblmw)
+[Easy (https://youtu.be/NYJF3HAblmw)](https://youtu.be/NYJF3HAblmw)
 
-[Medium](https://youtu.be/3CfEtC1Apzk)
+[Medium (https://youtu.be/3CfEtC1Apzk)](https://youtu.be/3CfEtC1Apzk)
 
 ## Installation and Setup Instructions
 
@@ -33,7 +33,7 @@ Clone down this repository. You will need `Python3` installed globally on your m
 
 Run:
 
-`python3 Main.py`
+`python3 main.py`
 
 ## Reflection
 
