@@ -26,7 +26,6 @@ Average Times V4 (Optimized Scanning and Clicking):
 
 ## Installation and Setup Instructions
 
-#### Example:
 
 Clone down this repository. You will need `Python3` installed globally on your machine.
 
@@ -34,11 +33,14 @@ To install required packages to run the program:
 
 `pip install -r requirements.txt`
 
-With a blank google minesweeper game on your screen, use the following commands
+With a blank google minesweeper game on your screen, use the following command
 
 Run:
 
 `python3 main.py`
+
+
+To halt running at any time, press `Q` on your keyboard and the program will exit
 
 ## Reflection
 

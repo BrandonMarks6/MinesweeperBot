@@ -72,7 +72,7 @@ class BoardFunctions:
         if location is not None:
             self.run_scanner(location, row_num, col_num)
 
-        self.DisplayDataObj.display("\nProgram Complete\n")
+        self.DisplayDataObj.display("Program Complete\n")
 
     """
     will check for win or lose images on screen and terminate program if seen
@@ -222,49 +222,10 @@ class BoardFunctions:
         row_param: int,
         col_param: int,
     ) -> None:
-        # will check for each picture on the screen
-        for current_picture in picture_list.keys():
-            # makes a tuple of all the locations of the current picture
-            # loops through each location in the tuple
-            all_found_locations = pyautogui.locateAllOnScreen(
-                current_picture, grayscale=True, confidence=0.85
-            )
+        self.find_numbers_and_flags(picture_list, curr_board, row_param, col_param)
+        self.find_blank_and_green_spaces(box_coords, curr_board, row_param, col_param)
 
-            """will check through all avaliable coords, incrementing until current set 
-            of coordinates are between upper and lower bound. repeats for x and y planes
-            """
-            for current_coords in all_found_locations:
-                row_to_insert: int = 0
-
-                # loop through current rows in board until the location is found
-                while row_to_insert + 1 < row_param:
-                    bottom_range_rows: int = curr_board[row_to_insert][0].y_position
-                    top_range_rows: int = curr_board[row_to_insert + 1][0].y_position
-                    if (
-                        current_coords.top > bottom_range_rows
-                        and current_coords.top < top_range_rows
-                    ):
-                        break
-                    row_to_insert += 1
-
-                # loop through current rows in board until the location is found
-                col_to_insert: int = 0
-                while col_to_insert + 1 < col_param:
-                    bottom_range_cols: int = curr_board[0][col_to_insert].x_position
-                    top_range_cols: int = curr_board[0][col_to_insert + 1].x_position
-                    if (
-                        current_coords.left > bottom_range_cols
-                        and current_coords.left < top_range_cols
-                    ):
-                        break
-                    col_to_insert += 1
-
-                # inserts in correct spot based on the coordinates of the found item
-                current_cell = curr_board[row_to_insert][col_to_insert]
-                current_cell.character = picture_list.get(current_picture)
-
-        # below will add all correct green spaces to the board
-
+    def find_blank_and_green_spaces(self, box_coords, curr_board, row_param, col_param):
         # takes a picture with extra wide of the board to make sure to capture entire thing
         im1 = pyautogui.screenshot(region=(box_coords))
         im1 = cv2.cvtColor(np.array(im1), cv2.COLOR_RGB2BGR)
@@ -282,26 +243,107 @@ class BoardFunctions:
         for row in range(row_param):
             for column in range(col_param):
                 # checks against the RGB values of the color of a light green or dark green square
-                light_green_values = (179, 214, 101)
-                dark_green_values = (172, 208, 94)
+
                 current_cell = curr_board[row][column]
                 if (
                     current_cell.character != self.BoardValuesObj.flag
                 ):  # only assigns a green tile if there is not a flag currently on the cell
-                    if (
-                        pix[
-                            (column * (pic_length / col_param)) + padding_num,
-                            (row * (pic_height / row_param)) + padding_num,
-                        ]
-                        == light_green_values
-                    ) or (
-                        pix[
-                            (column * (pic_length / col_param) + padding_num),
-                            (row * (pic_height / row_param) + padding_num),
-                        ]
-                        == dark_green_values
+                    if self.is_pixel_green(
+                        pix,
+                        row,
+                        column,
+                        pic_length,
+                        pic_height,
+                        padding_num,
+                        row_param,
+                        col_param,
                     ):
                         current_cell.character = self.BoardValuesObj.unclicked_square
+
+    def is_pixel_green(
+        self,
+        pix,
+        row,
+        column,
+        pic_length,
+        pic_height,
+        padding_num,
+        row_param,
+        col_param,
+    ):
+        light_green_values = (179, 214, 101)
+        dark_green_values = (172, 208, 94)
+        if (
+            pix[
+                (column * (pic_length / col_param)) + padding_num,
+                (row * (pic_height / row_param)) + padding_num,
+            ]
+            == light_green_values
+        ) or (
+            pix[
+                (column * (pic_length / col_param) + padding_num),
+                (row * (pic_height / row_param) + padding_num),
+            ]
+            == dark_green_values
+        ):
+            return True
+        else:
+            return False
+
+    def find_numbers_and_flags(self, picture_list, curr_board, row_param, col_param):
+        # will check for each picture on the screen
+        for current_picture in picture_list.keys():
+            # makes a tuple of all the locations of the current picture
+            # loops through each location in the tuple
+            all_found_locations = pyautogui.locateAllOnScreen(
+                current_picture, grayscale=True, confidence=0.85
+            )
+
+            """will check through all avaliable coords, incrementing until current set 
+            of coordinates are between upper and lower bound. repeats for x and y planes
+            """
+            for current_coords in all_found_locations:
+                row_to_insert: int = self.find_row_to_insert(
+                    row_param, curr_board, current_coords
+                )
+                col_to_insert: int = self.find_col_to_insert(
+                    col_param, curr_board, current_coords
+                )
+
+                # inserts in correct spot based on the coordinates of the found item
+                current_cell = curr_board[row_to_insert][col_to_insert]
+                current_cell.character = picture_list.get(current_picture)
+
+    def find_col_to_insert(self, col_param, curr_board, current_coords):
+        col_to_insert: int = 0
+
+        while col_to_insert + 1 < col_param:
+            bottom_range_cols: int = curr_board[0][col_to_insert].x_position
+            top_range_cols: int = curr_board[0][col_to_insert + 1].x_position
+            if (
+                current_coords.left > bottom_range_cols
+                and current_coords.left < top_range_cols
+            ):
+                break
+            col_to_insert += 1
+
+        return col_to_insert
+
+    def find_row_to_insert(self, row_param, curr_board, current_coords):
+        # loop through current rows in board until the location is found
+        row_to_insert: int = 0
+
+        while row_to_insert + 1 < row_param:
+            bottom_range_rows: int = curr_board[row_to_insert][0].y_position
+            top_range_rows: int = curr_board[row_to_insert + 1][0].y_position
+            if (
+                current_coords.top > bottom_range_rows
+                and current_coords.top < top_range_rows
+            ):
+                break
+            row_to_insert += 1
+
+        return row_to_insert
 
     """
     Scans and populates the board
@@ -384,6 +426,6 @@ class BoardFunctions:
 
         end_time = time.time()
         board_scan_message = (
-            "Board Scan complete in " + str((end_time - start_time)) + " seconds"
+            "Board Scan complete in " + str(int(end_time - start_time)) + " seconds"
         )
         self.DisplayDataObj.display(board_scan_message)
