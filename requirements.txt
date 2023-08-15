@@ -3,3 +3,4 @@ Pillow==9.5.0
 opencv-contrib-python==4.7.0.72
 opencv-python==4.7.0.72
 PyAutoGUI==0.9.53
+pynput==1.7.6
