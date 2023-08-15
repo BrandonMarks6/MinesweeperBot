@@ -5,50 +5,72 @@ import pyautogui
 
 
 class Actions:
-    def __init__(self, board_values):
+    def __init__(self, board_values) -> None:
         self.board_values = board_values
-        
+
     # constants
-    PADDING_FACTOR = 20
-    PIXEL_DIVISION_FACTOR = (
+    MINIMUM_ROW_COL = 0
+    PADDING_FACTOR: int = 20
+    PIXEL_DIVISION_FACTOR: int = (
         2  # Is used to convert coordinates from pyautogui to correct location
     )
 
-
-    def click_all_around(self, board, row, col, max_row, max_col):
+    def click_all_around(
+        self, board: list, row: int, col: int, max_row: int, max_col: int
+    ) -> None:
+        low_bound_row = row - 1
+        up_bound_row = row + 2
+        low_bound_col = col - 1
+        up_bound_col = col + 2
         # will loop through the 3x3 grid of cells around passed in cell
-        for curr_row in range(row - 1, row + 2):
-            for curr_col in range(col - 1, col + 2):
+        for curr_row in range(low_bound_row, up_bound_row):
+            for curr_col in range(low_bound_col, up_bound_col):
                 if (
-                    0 <= curr_row < max_row  and 0 <= curr_col < max_col
+                    self.MINIMUM_ROW_COL <= curr_row < max_row
+                    and self.MINIMUM_ROW_COL <= curr_col < max_col
                 ):  # tests to make sure number is in correct range
                     current_space = board[curr_row][curr_col]
                     if (
-                        not current_space.clicked and current_space.val == self.board_values.unclicked_square
+                        not current_space.clicked
+                        and current_space.character
+                        == self.board_values.unclicked_square
                     ):  # if cell has not already been clickd and it is a correct value,
-                        #click it and mark as clicked
+                        # click it and mark as clicked
                         pyautogui.click(
-                            current_space.coord1 / self.PIXEL_DIVISION_FACTOR + self.PADDING_FACTOR,
-                            current_space.coord2 / self.PIXEL_DIVISION_FACTOR + self.PADDING_FACTOR,
+                            current_space.x_position / self.PIXEL_DIVISION_FACTOR
+                            + self.PADDING_FACTOR,
+                            current_space.y_position / self.PIXEL_DIVISION_FACTOR
+                            + self.PADDING_FACTOR,
                         )
                         current_space.clicked = True
 
-
-    def right_click_all_around(self, board, row, col, max_row, max_col):
+    def right_click_all_around(
+        self, board: list, row: int, col: int, max_row: int, max_col: int
+    ) -> None:
         # will loop through the 3x3 grid of cells around passed in cell
-        for curr_row in range(row - 1, row + 2):
-            for curr_col in range(col - 1, col + 2):
+        low_bound_row = row - 1
+        up_bound_row = row + 2
+        low_bound_col = col - 1
+        up_bound_col = col + 2
+        # will loop through the 3x3 grid of cells around passed in cell
+        for curr_row in range(low_bound_row, up_bound_row):
+            for curr_col in range(low_bound_col, up_bound_col):
                 if (
-                    0 <= curr_row < max_row and 0 <= curr_col < max_col
+                    self.MINIMUM_ROW_COL <= curr_row < max_row
+                    and self.MINIMUM_ROW_COL <= curr_col < max_col
                 ):  # tests to make sure number is in correct range
                     current_space = board[curr_row][curr_col]
 
                     if (
-                        not current_space.clicked and current_space.val == self.board_values.unclicked_square
+                        not current_space.clicked
+                        and current_space.character
+                        == self.board_values.unclicked_square
                     ):  # if cell has not already been clickd and it is a correct value,
-                        #click it and mark as clicked
+                        # click it and mark as clicked
                         pyautogui.rightClick(
-                            current_space.coord1 / self.PIXEL_DIVISION_FACTOR +self.PADDING_FACTOR,
-                            current_space.coord2 / self.PIXEL_DIVISION_FACTOR + self.PADDING_FACTOR,
+                            current_space.x_position / self.PIXEL_DIVISION_FACTOR
+                            + self.PADDING_FACTOR,
+                            current_space.y_position / self.PIXEL_DIVISION_FACTOR
+                            + self.PADDING_FACTOR,
                         )
-                        board[curr_row][curr_col].val = self.board_values.flag
+                        board[curr_row][curr_col].character = self.board_values.flag
