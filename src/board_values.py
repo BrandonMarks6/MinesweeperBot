@@ -1,13 +1,12 @@
 class BoardValues:
     def __init__(self):
-        self.one = "1"
-        self.two = "2"
-        self.three = "3"
-        self.four = "4"
-        self.five = "5"
-        self.six = "6"
-        self.seven = "7"
-        self.flag = "X"
-        self.clicked_square = "."
-        self.unclicked_square = "-"
-
+        self.one: str = "1"
+        self.two: str = "2"
+        self.three: str = "3"
+        self.four: str = "4"
+        self.five: str = "5"
+        self.six: str = "6"
+        self.seven: str = "7"
+        self.flag: str = "X"
+        self.clicked_square: str = "."
+        self.unclicked_square: str = "-"
