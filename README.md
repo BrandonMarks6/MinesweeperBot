@@ -1,6 +1,5 @@
 # MinesweeperBot
 
-## Description
 A program to autonomously play Google Minesweeper, built using Python3, pyautogui, and CV2. Using a combination of image recognition and graph traversal techniques, the program achieves times much faster than the average player.
 
 Average Times V1:
@@ -30,6 +29,12 @@ Average Times V4 (Optimized Scanning and Clicking):
 #### Example:
 
 Clone down this repository. You will need `Python3` installed globally on your machine.
+
+To install required packages to run the program:
+
+`pip install -r requirements.txt`
+
+With a blank google minesweeper game on your screen, use the following commands
 
 Run:
 
