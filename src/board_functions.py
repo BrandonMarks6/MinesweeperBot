@@ -3,6 +3,8 @@ import sys
 
 import pyautogui
 import cv2
+import threading
+from pynput import keyboard
 
 import numpy as np
 from PIL import Image
@@ -35,12 +37,42 @@ class BoardFunctions:
         # allows program to click faster and makes sure program can be easily killed
         pyautogui.PAUSE = 0.001
 
+        self.exit_event = threading.Event()
+
         self.BoardValuesObj = BoardValues()
         self.DisplayDataObj = DisplayData()
         self.ActionObj = Actions(self.BoardValuesObj)
         self.MinesweeperRulesObj = MinesweeperRules(
             self.ActionObj, self.BoardValuesObj, self.DisplayDataObj
         )
+
+    def start_listener(self):
+        with keyboard.Listener(on_press=self.on_key_press) as listener:
+            listener.join()
+
+    def on_key_press(self, key):
+        try:
+            # Convert the key to a string
+            key_str = key.char
+            if key_str == "q":
+                exit_quit_message: str = "\nExit Key pressed. Exiting program ASAP\n"
+                self.DisplayDataObj.display(exit_quit_message)
+                self.exit_event.set()  # Signal the program to exit
+                return False
+        except AttributeError:
+            pass  # Ignore special keys (non-character keys)
+
+    def run_program(self):
+        # Start the keyboard listener in a separate thread
+        keyboard_thread = threading.Thread(target=self.start_listener)
+        keyboard_thread.daemon = True  # Set the thread as daemon
+        keyboard_thread.start()
+
+        location, row_num, col_num = self.find_board()
+        if location is not None:
+            self.run_scanner(location, row_num, col_num)
+
+        self.DisplayDataObj.display("\nProgram Complete\n")
 
     """
     will check for win or lose images on screen and terminate program if seen
@@ -85,6 +117,10 @@ class BoardFunctions:
             self.scan_board(curr_board, box_coords, row_num, col_num, do_deep_scan)
             do_deep_scan = False
 
+            if self.exit_event.is_set():
+                running = False
+                break
+
             # self.DisplayDataObj.displays current board to terminal
             for row in range(len(curr_board)):
                 current_row = []
@@ -112,6 +148,9 @@ class BoardFunctions:
 
             game_ended: bool = self.check_game_over()
             running = not game_ended
+
+            if self.exit_event.is_set():
+                running = False
         return False
 
     """
@@ -126,7 +165,9 @@ class BoardFunctions:
 
         # will attempt to find 10 times
         interation_number: int = 10
-        for _ in range(interation_number):
+        for location_attempt_num in range(interation_number):
+            if self.exit_event.is_set():
+                return None, None, None
             board_loc_easy: bool = pyautogui.locateOnScreen(
                 "PictureHolder/EasyMap.png", confidence=0.85
             )
@@ -151,11 +192,15 @@ class BoardFunctions:
                 self.double_click_middle(board_loc_hard)
                 return board_loc_hard, self.HARD_HEIGHT, self.HARD_LENGTH
 
-            self.DisplayDataObj.display("Board not found")
+            if location_attempt_num == 10:
+                self.DisplayDataObj.display(
+                    "Board not found after 10 attempts. Exiting"
+                )
+                break
+            else:
+                self.DisplayDataObj.display("Board not found")
             time.sleep(seconds_to_sleep)
-
-        self.DisplayDataObj.display("Board not found after 10 attempts")
-        sys.exit("Quit")
+        return None, None, None
 
     def double_click_middle(self, coords: tuple) -> None:
         pixel_resolution_number: int = 2
@@ -339,6 +384,6 @@ class BoardFunctions:
 
         end_time = time.time()
         board_scan_message = (
-            "Board Scan complete in " + str(int(end_time - start_time)) + " seconds"
+            "Board Scan complete in " + str((end_time - start_time)) + " seconds"
         )
         self.DisplayDataObj.display(board_scan_message)
