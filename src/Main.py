@@ -17,8 +17,7 @@ def main() -> None:
 
     DisplayDataObj.display(startMessage)
 
-    location, row_num, col_num = BoardFunctionsObj.find_board()
-    BoardFunctionsObj.run_scanner(location, row_num, col_num)
+    BoardFunctionsObj.run_program()
 
 
 # calls the main function
