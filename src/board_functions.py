@@ -1,13 +1,13 @@
 import time
-import sys
 
 import pyautogui
 import cv2
 import threading
-from pynput import keyboard
 
 import numpy as np
+
 from PIL import Image
+from pynput import keyboard
 
 from minesweeper_rules import MinesweeperRules
 from board_values import BoardValues
